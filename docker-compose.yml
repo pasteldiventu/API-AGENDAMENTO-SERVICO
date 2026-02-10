@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: agendamento_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: agendamento_db
+      POSTGRES_USER: agendamento_user
+      POSTGRES_PASSWORD: agendamento_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    container_name: agendamento_api
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      # A URL de banco usada pelo Settings (app/core/config.py)
+      DATABASE_URL: postgresql://agendamento_user:agendamento_password@db:5432/agendamento_db
+      BOT_API_KEY: changeme-bot-api-key
+    ports:
+      - "8000:8000"
+
+volumes:
+  db_data:
+
+
